@@ -6,9 +6,10 @@ import (
   "log"
   "strconv"
   "os"
+  "sort"
 )
 
-func Part1() {
+func Part2() {
   file, err := os.Open("input.txt")
   if err != nil {
     log.Fatal(err)
@@ -31,14 +32,14 @@ func Part1() {
     }
   }
 
-  var mostCalories, largestElf int
-  for index, element := range elfCalories {
-    if element > mostCalories {
-      mostCalories = element
-      largestElf = index
-    }
+  sort.Ints(elfCalories)
+
+  threeLargest := elfCalories[len(elfCalories)-3:]
+  var totalCalories = 0
+  for _, element := range threeLargest {
+    totalCalories += element
   }
-  fmt.Println("Elf", largestElf, "has the most calories:", mostCalories)
+  fmt.Println("The total of the largest 3:", totalCalories)
 
   if err := scanner.Err(); err != nil {
       log.Fatal(err)

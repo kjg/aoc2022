@@ -1,3 +1,3 @@
-module aoc2021/day1
+module kjg/aoc2022/day1
 
 go 1.17
