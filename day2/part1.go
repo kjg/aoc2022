@@ -25,40 +25,49 @@ func Part1() {
 		roundScore := roundScore(round)
 		totalScore += roundScore
 	}
-	fmt.Println("My total score: ", totalScore)
+	fmt.Println("Part1 total score: ", totalScore)
 }
 
 func roundScore(round []string) int {
-	return shapeScore(round[1]) + outcomeScore(round[0], round[1])
+	return shapeScore(shapeLookup(round[1])) + outcomeScore(outcome(round[0], round[1]))
 }
 
 func shapeScore(me string) int {
 	shapeScores := map[string]int{
-		"X": 1,
-		"Y": 2,
-		"Z": 3,
+		"Rock":     1,
+		"Paper":    2,
+		"Scissors": 3,
 	}
 	return shapeScores[me]
 }
 
-func outcomeScore(opponent, me string) int {
+func outcomeScore(outcome string) int {
+	outcomeScores := map[string]int{
+		"Win":  6,
+		"Lose": 0,
+		"Draw": 3,
+	}
+	return outcomeScores[outcome]
+}
+
+func outcome(opponent, me string) string {
 
 	opponentShape := shapeLookup(opponent)
 	myShape := shapeLookup(me)
 
 	if myShape == opponentShape {
-		return 3
+		return "Draw"
 	}
 	if myShape == "Rock" && opponentShape == "Scissors" {
-		return 6
+		return "Win"
 	}
 	if myShape == "Paper" && opponentShape == "Rock" {
-		return 6
+		return "Win"
 	}
 	if myShape == "Scissors" && opponentShape == "Paper" {
-		return 6
+		return "Win"
 	}
-	return 0
+	return "Lose"
 }
 
 func shapeLookup(shape string) string {
