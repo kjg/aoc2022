@@ -27,7 +27,6 @@ func Part1() {
 		compartment2 := sack[sackLength/2:]
 
 		var commonItem rune
-		var itemPriority int
 
 		for _, item := range compartment2 {
 			if strings.ContainsRune(compartment1, item) {
@@ -35,14 +34,17 @@ func Part1() {
 				break
 			}
 		}
-		if unicode.IsLower(commonItem) {
-			itemPriority = int(commonItem) - int('a') + 1
-		} else {
-			itemPriority = int(commonItem) - int('A') + 1 + 26
-		}
 
-		totalPriority += itemPriority
+		totalPriority += getPriority(commonItem)
 	}
 
-	fmt.Println("The total priority is:", totalPriority)
+	fmt.Println("The total part 1 priority is:", totalPriority)
+}
+
+func getPriority(item rune) int {
+	if unicode.IsLower(item) {
+		return int(item) - int('a') + 1
+	} else {
+		return int(item) - int('A') + 1 + 26
+	}
 }
