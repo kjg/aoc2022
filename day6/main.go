@@ -10,7 +10,7 @@ func main() {
 	stream := string(input)
 
 	fmt.Println("Part 1: ", markerAfter(stream, 4))
-	fmt.Println("Part 1: ", markerAfter(stream, 14))
+	fmt.Println("Part 2: ", markerAfter(stream, 14))
 }
 
 func markerAfter(stream string, uniqueNeeded int) int {
