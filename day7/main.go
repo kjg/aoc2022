@@ -11,10 +11,6 @@ import (
 )
 
 func main() {
-	Part1()
-}
-
-func Part1() {
 	file, err := os.Open("input.txt")
 	if err != nil {
 		log.Fatal(err)
@@ -44,6 +40,12 @@ func Part1() {
 	}
 
 	fmt.Println("Part1: Total of dirs", totalOfDirsUnder(100001, dirSizes))
+
+	totalUsed := dirSizes[""]
+	totalCurrentlyFree := 70000000 - totalUsed
+	freeSpaceNeeded := 30000000 - totalCurrentlyFree
+
+	fmt.Println("Part 2: size of dir to delete: ", SmallestDirOver(freeSpaceNeeded, dirSizes))
 }
 
 func changeDir(newDir string, currentDir string) string {
@@ -74,4 +76,14 @@ func totalOfDirsUnder(size int, dirSizes map[string]int) int {
 		}
 	}
 	return total
+}
+
+func SmallestDirOver(size int, dirSizes map[string]int) int {
+	smallest := 0
+	for _, dirSize := range dirSizes {
+		if dirSize > size && (smallest == 0 || dirSize < smallest) {
+			smallest = dirSize
+		}
+	}
+	return smallest
 }
