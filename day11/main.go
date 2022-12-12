@@ -14,16 +14,32 @@ func main() {
 	stream := string(input)
 
 	monkeyInputs := strings.Split(stream, "\n\n")
+
+	doMonkeyBusiness(monkeyInputs, 20, 3)
+	doMonkeyBusiness(monkeyInputs, 10000, 1)
+}
+
+func doMonkeyBusiness(monkeyInputs []string, rounds int, worryReducer int) {
+
 	monkeys := make([]Monkey, 0, len(monkeyInputs))
 
+	divisibilities := make([]int, 0, len(monkeyInputs))
+
 	for _, monkeyInput := range monkeyInputs {
-		monkeys = append(monkeys, configureMonkey(monkeyInput))
+		monkey := configureMonkey(monkeyInput)
+		monkeys = append(monkeys, monkey)
+		divisibilities = append(divisibilities, monkey.test)
 	}
 
-	for round := 1; round <= 20; round++ {
+	commonDivisibility := 1
+	for _, divisibility := range divisibilities {
+		commonDivisibility *= divisibility
+	}
+
+	for round := 1; round <= rounds; round++ {
 		for monkeyNumber := 0; monkeyNumber < len(monkeys); monkeyNumber++ {
 			monkey := &monkeys[monkeyNumber]
-			monkey.performInspection(monkeys)
+			monkey.performInspection(monkeys, worryReducer, commonDivisibility)
 
 		}
 		fmt.Println("Round", round, "complete", monkeys)
@@ -99,10 +115,20 @@ func parseFail(input string) int {
 	return fail
 }
 
-func (m *Monkey) performInspection(monkeys []Monkey) {
+func (m *Monkey) performInspection(monkeys []Monkey, worryReducer int, commonDivisibility int) {
 	for _, item := range m.items {
 		m.inspectionCount++
-		worryLevel := m.calculateWorryLevel(item) / 3
+
+		worryLevel := m.calculateWorryLevel(item)
+
+		if worryLevel > commonDivisibility {
+			fmt.Println("Worry level:", worryLevel, "common divisibility:", commonDivisibility)
+			worrySubtractor := (worryLevel / commonDivisibility) * commonDivisibility
+			worryLevel -= worrySubtractor
+			fmt.Println("Worry subtractor:", worrySubtractor)
+		} else {
+			worryLevel = worryLevel / worryReducer
+		}
 
 		testResult := worryLevel%m.test == 0
 		if testResult {
