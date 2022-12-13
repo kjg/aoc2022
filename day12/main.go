@@ -12,7 +12,8 @@ func main() {
 	rows := strings.Split(stream, "\n")
 	rows = rows[:len(rows)-1]
 
-	var startPos Coordinate
+	singleStart := make([]Coordinate, 1)
+	startPositions := make([]Coordinate, 0)
 	var endPos Coordinate
 
 	elevations := make(map[Coordinate]string)
@@ -22,7 +23,11 @@ func main() {
 	for rowNum, row := range rows {
 		for colNum, col := range row {
 			if string(col) == "S" {
-				startPos = Coordinate{colNum, rowNum}
+				singleStart[0] = Coordinate{colNum, rowNum}
+				startPositions = append(startPositions, Coordinate{colNum, rowNum})
+			}
+			if string(col) == "a" {
+				startPositions = append(startPositions, Coordinate{colNum, rowNum})
 			}
 			if string(col) == "E" {
 				endPos = Coordinate{colNum, rowNum}
@@ -32,15 +37,22 @@ func main() {
 		}
 	}
 
-	heightmap := Heightmap{startPos, endPos, make(map[Coordinate]bool), make([]Coordinate, 0, height*width), make(map[Coordinate]int), elevations, height, width}
+	heightmap := Heightmap{singleStart, endPos, make(map[Coordinate]bool), make([]Coordinate, 0, height*width), make(map[Coordinate]int), elevations, height, width}
 
 	heightmap.toDo = append(heightmap.toDo, endPos)
-	heightmap.doSearch()
+	shortestPath := heightmap.doSearch()
 
-	fmt.Println(heightmap.distances[startPos])
+	fmt.Println("The shortest path is", shortestPath, "steps long")
+
+	heightmap = Heightmap{startPositions, endPos, make(map[Coordinate]bool), make([]Coordinate, 0, height*width), make(map[Coordinate]int), elevations, height, width}
+
+	heightmap.toDo = append(heightmap.toDo, endPos)
+	shortestPath = heightmap.doSearch()
+
+	fmt.Println("The shortest path is", shortestPath, "steps long")
 }
 
-func (h Heightmap) doSearch() {
+func (h Heightmap) doSearch() int {
 
 	for len(h.toDo) > 0 {
 		check := h.toDo[0]
@@ -95,8 +107,8 @@ func (h Heightmap) doSearch() {
 		}
 
 		h.processeed[check] = true
-		if check == h.startPos {
-			fmt.Println("Found start", check)
+		if len(h.startPositions) == 0 {
+			fmt.Println("Found all starts")
 			h.toDo = []Coordinate{}
 		} else {
 			h.toDo = h.toDo[1:]
@@ -105,17 +117,25 @@ func (h Heightmap) doSearch() {
 		fmt.Println("checked", check, h.distances[check], "To do", h.toDo)
 	}
 
+	shortestPath := -1
+	for _, startPos := range h.startPositions {
+		currentDistance := h.distances[startPos]
+		if (currentDistance < shortestPath || shortestPath == -1) && currentDistance > 0 {
+			shortestPath = h.distances[startPos]
+		}
+	}
+	return shortestPath
 }
 
 type Heightmap struct {
-	startPos   Coordinate
-	endPos     Coordinate
-	processeed map[Coordinate]bool
-	toDo       []Coordinate
-	distances  map[Coordinate]int
-	elevations map[Coordinate]string
-	height     int
-	width      int
+	startPositions []Coordinate
+	endPos         Coordinate
+	processeed     map[Coordinate]bool
+	toDo           []Coordinate
+	distances      map[Coordinate]int
+	elevations     map[Coordinate]string
+	height         int
+	width          int
 }
 
 type Coordinate struct {
